@@ -1,9 +1,119 @@
 # Lecture 07 Excercises
 
 ## Exercise 1 - Authentication and authorization
+the GraphQl schema is as follows after adding the user type 
+```mermaid	
+classDiagram
+    class typeDefs {
+        Order
+        Delivery
+        Address
+        Query
+        Mutation
+        SeedResponse
+        OrderInput
+        DeliveryInput
+        AddressInput
+        User
+    }
+    
+    class Order {
+        id: ID!
+        material: String!
+        amount: Int!
+        currency: String!
+        price: Float!
+        timestamp: String!
+        delivery: Delivery!
+    }
+    
+    class Delivery {
+        first_name: String!
+        last_name: String!
+        address: Address!
+    }
+    
+    class Address {
+        street_name: String!
+        street_number: String!
+        city: String!
+    }
+    
+    class Query {
+        orders: [Order!]!
+        order(id: ID!): Order
+    }
+    
+    class Mutation {
+        createOrder(input: OrderInput!): Order!
+        updateOrder(id: ID!, input: OrderInput!): Order!
+        deleteOrder(id: ID!): Order!
+        seedDatabase: SeedResponse!
+    }
+    
+    class SeedResponse {
+        orders: OrderSeedResult!
+    }
+    
+    class OrderSeedResult {
+        ids: [ID!]!
+        count: Int!
+    }
+    
+    class OrderInput {
+        material: String!
+        amount: Int!
+        currency: String!
+        price: Float!
+        timestamp: String!
+        delivery: DeliveryInput!
+    }
+    
+    class DeliveryInput {
+        first_name: String!
+        last_name: String!
+        address: AddressInput!
+    }
+    
+    class AddressInput {
+        street_name: String!
+        street_number: String!
+        city: String!
+    }
+
+    class User {
+        first_name: String!
+        last_name: String!
+        email: String!
+    }
+
+    typeDefs <-- Order
+    typeDefs <-- Delivery
+    typeDefs <-- Address
+    typeDefs <-- Query
+    typeDefs <-- Mutation
+    typeDefs <-- SeedResponse
+    typeDefs <-- OrderInput
+    typeDefs <-- DeliveryInput
+    typeDefs <-- AddressInput
+    typeDefs <-- User
+    
+    Order --> Delivery: delivery
+    Delivery --> Address: address
+    Query --> Order: orders
+    Query --> Order: order
+    Mutation --> Order: createOrder
+    Mutation --> Order: updateOrder
+    Mutation --> Order: deleteOrder
+    Mutation --> SeedResponse: seedDatabase
+    SeedResponse --> OrderSeedResult: orders
+
+
+``` 
+
 
 ### 1.1
-[Diagram Link Text](https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1&title=Untitled%20Diagram.drawio#R7V1dc9u4Ff0t%2B%2BCZ9mEzuAAuPh6TeLfZTDPbNg%2Fb9qXDWIytrixqKCqx%2B%2Bv3QiJlkZeW6MgEmKkdJZFAUiYPDu%2FHAS54od7e3v2lzFY3H4pZvriQYnZ3oS4vpNTKCvovtNzvWqTSdct1OZ%2Ft2uCh4eP8f3nd2Oy2mc%2FydWvHqigW1XzVbrwqlsv8qmq1ZWVZfG3v9rlYtH%2FrKrvOWcPHq2zBW3%2Bbz6qbXauT9qH9XT6%2Fvml%2BMxi%2F23KbNTvXV7K%2ByWbF14Mm9dOFelsWRbV7d3v3Nl8E9Bpcdsf9%2FMjW%2FYmV%2BbIacsCXd7N3G3fn%2Fv3rrfntvZvj%2B%2FfVj6BcfXbVfXPJ%2BYwQqD8WZXVTXBfLbPHTQ%2BubstgsZ3n4XkGfHvb5a1GsqBGo8b95Vd3X3ZltqoKabqrbRb2VTrm8%2F2c4%2FpXE5vO%2F6u%2Fbfri8a326rz%2FtTjac4aMo1E3rYlNe5UcuHVVNp6y8zqtjO9p9bxHP8%2BI2pzOiA8t8kVXzL%2B0zyWq%2BXe%2F3e%2BgSelP3ypN6yCfuocl3kFFndtD20Ndlmd0f7LAq5stqffDNfwsNtENt3MBAfe%2FUtk35zg3IDlD62AH0ZncOD2TZX8wZ%2FGkM7gt%2FHt3RJOGPa5zj%2FZ5Qx%2FnTPcAc55vUxh3Zfyy6wQvdTpgrmchc2bb16cYLXfqAP%2FcAd4qgXh47YCyGyheGnmAofBcMBS%2FEeQcYiEI4%2FUK4Ex7Y%2FZ8QzuEpk2j9sQPGYqh5YegJhmIShirxxBixewDCCYYKkMcOGItw9oVwJwinv0%2FCud2Jj8ufBsUv2WJTI1Hdr%2FLL%2FPOa8errzbzKP66ybbd8LTOiypt1VRa%2F7wU9AuPN52JZ1bzZKlL19%2Bdlld8d73TeRc0BKEwbywaqrw9KIvmQXdvNoYoo5eP9epaaVHfOIXC%2FlrO8%2FEbUngEl30kanLMMJLQco0ZLeX6IkEF0mS%2Fojqu%2FOw1KFttWGjmVml3ioGQYSq9nszJff%2BsN%2BAwgSa3avszLV8hhkjFhsgymv28SM6ltlKTmTEIfEyLHIPqwqcjHFcukVOrE4bbnhosKk2cwfczz2T%2Fy9apYrvN0UIF17QjAW8WgAohpnGqhk3m5GrDNokoJV1f2Fcg9HjTYxMEL%2BvH6ZbnaJIRKatn2ekbxm9BHBUoyoJrYIDlWqm3XdU%2BwCQAxweJBeh0iJMYKsGOxNPRgJWJad8Pj8rD%2Fa2r65fKHdFAhqK6x8gyqqOGC4eH5bVbl5Txb7PD6WJXz5XVCzEyTvR3DLLKB59F6dltswvVsKbasEuLlWJrch5eIGkDwsP1qU9IFXd1PhGS%2B8dnHSWZigsYD%2BVU5D0gExH5eFFlKlsFeczxOs6i3JY%2Fpq%2Fltvq6y29VEeAZKDCFaI0dEgc3y8H7WKDRb1JqYLCVuOAg37WLixsP8z%2FNyXf1nmd3mE%2BGbVZ05K9iTTMZlG4%2F5F9m0QPMdsaIXNB1TRLU89s9qeXALWZ0IJPUHCgeAFpVpPAmgS8%2FzSXFNQpOrNIbNY4%2FKut8rDnI8KWiQ29x%2BysupYKesG4JdVGHR8tzgal5NJc6VRtghkImoNypPD4qgl9XG7QLfbOWzHy4wZe7uOl5B6R4Dp2KmVZZnCFvc%2FnSgdfx59y7xqCQIqU%2BD18iBccDjycJVmWdV%2FusOwq2m9oDdVmNroZnS2XrddrZ9YwRK9AyFjwan40nEZjV7gPNQfXsbvmzK%2BBKg7jS%2BUenqeLJBSVreg%2B9UMLRwehyL7vmYGPLUY53ns8usyj5l6yYiPBgFTAlfd2C5Fz4ZM7JxPAmZmFQMvjMSYVWfj44ZSjuehExHKmbJRy9eUaVix1OPiUnFUoE%2FDVpUqdjxnGNCUrFEMYRlUe9KnnFMTSmWBgfQLKp053i%2B0S8U74K5hNg5dKexc1HtGk83JicWB0xasKFITTnP04qpqcVSD0EtqlzsebLQJxcnv00N4GnkbFTkelKEyWnGoFR7MGw%2FrSSZYux5bjBFxRiwI5z0IhdVL%2FY8QZiQXkx3nz4NWFS1eP%2FbDhBjAFHO8GVb2gRbZLKyeh1Wr6GGZbHMtxVJs6bl06K4%2Bj003c2rXTWTEFoJcOCNFBIVGKw3b6ubXqFXRgNKi3SXuQDfYSmU9s5qJYWhrVZ5YKVR7bqr3ak%2FTzFU7YdOF0P5%2Fk4fe4UG1R57aMZZx62NE9wZPjNdenu8Zku3Tk5QXE%2FEAWfQWDDxuOEHcsOIcbnRuvefpX%2B5YvCs%2FftjsAdKOq%2BtMk4HPUSatj1wDqxz1LfCOKU973LtlEDhtNV0j0brcj20y5PURmJnyp3XMSplBZdKIrPFyOBVpBPoQKJjbAHjhTXak%2BOxCibIliSl27Yzbh2JLVwniswWchXWOEHhFGpvnGG2RTnhsf5XT5AtSRaDcjYJW7g%2B9uyRhkIyG6CFIndCF3kk0BDeUozB1wOcACfOXQEweojBxbtn7ljvhRZoBVjUyqHv2ACpvPToRdBMDPMYwgvQWipyG16qCfZ3muVoJKQwAjB6dnqUK0Yqgw4hkEIEp9nlihRONT9T9BdpUlPldQqujJ6aHuUKWmc0hOESDw6Q6RgUkwjaIWz14KfHFTtyqvoIV7ARO%2BNyhSvTQweQzo5QtQChwex%2F2nKYpbwWiGBEI1RSMZOjjLd%2Bf3Q8GuFQGj0igY4cokLb4hiIIYYB1%2BkHjqedHbi2fo5IZJTmoHeGLDKSgYoZzwwmjPzO4lfgYwzDykfOdj7G2n28odtWw4dKZ6Tt3pFx4DopJXFeGy0dWogYqAwmQZpVsqXolNnEMRuPF4SM732IHI7yGgP1T5tGGlXIctEaFVYG7Ya7GFZu8KCN0jFZZIayKIn0GtaybrEIDNRVICPziKuvTxgmPtcFQViFQtmjvsdLdIIyaUmcMj5itDKYMSPLr8%2FvfHqK%2F08OcJ%2FpeFxIeyxFEVuDITvhqiFjAeSaFKgDzXQ%2FlieFgpiy2eCeTyKlSoOdirFYtuKR6qZBVWHnjv9bpYlC5HnCcExYV%2F2QQRSWBH2FSGYceMUY5OkgIpHdveIRyQ4l0sj6az%2BRfGddEiWiRC5cun1ajdy5IbBzVmvigXLeqSfQKKIBGsybNDoudELeOMSRXMc9tz5w1ElJJqh8GBIES3%2B6wi8ZJY0OlTci%2FI0YCQ%2Bdk2STCL9S%2BE6ZVZQ5SZILv89eLXke21CE1JuSLyU9hIdmHRtpFGENOKAA24KM6O%2BGUst9b1OaJNd6v6nY8xwKABkch6jJM1EQ4622bXNjLWXkSmqkN8owc0PejnIoh7B9TXAOpEui%2BkrXKRaIZG96pmc%2FsfJ1RC4hRUYAhkIk470BPp%2FWCErIMDgwwIh68GAqjawH91OJwiCRgkpcSx5WBXy2DijDIAJS4q6c9JbC6rZBMhRkO2HIFRlN1oeRSIC1Ujkn0MfzUc0cx9McSiInS9FZxY9uwBgc4nLyyaLokeljrfXSmFBCDkEoZGPhhjK0Zp6diqcLDidQIiUZTAoC9SyyNKhK%2FLygGLwlL2ToKq0hHhym85wwCi1SYGQo%2Bcd4kyeG8yXJNF66gZIYHK5Bny6QP48r1mvlJepQQ4WhsPZIAoXWadrVRZ7AN5wraZRnxCRc4brzwLUBzpUKtVZAEa5Hq8OzZtvuSXgLipxXEHm06Vob4s3DQLuKl24Np1ASzVnazjOiI1GIi85PWihhRCJRbAyKUFFG0maluqYIwIXn%2FtSvCfIoiQZNWEECHimuQceY8xeiZUGhsget96%2F20EUIppFcHBqA2rm1WHQw7SfiLONmRbbTLEojNsvOzFFtorCIi81R5vwRDTzxSFm3ex2LgEAr7Slttx79A52mQxj%2FvUnIzaPbvm0JkHPFPqW1s4bStPBqj3qGPqazkzps8nwswSKZHgVhBF5HTLMHEyGNbGw7S2hFshyPr%2Box%2FrQ%2FKaxDRKHRWcBatHugkVXhERSUMAkfnrqbavC8eSrTaeIkEYlBd5441DwQe2TiPL70eoR5ftZ7IkeQ8wTx5%2Bh0Pxd0PyW9Ec4rFzFSGUybkXXh53c8PQs4jj3dzzthiNgUkdowmbwdqoY4NYj%2BWvqQEHGdTtdTQifW8WkeWO06C3WfaS%2FoY1kU1eHuZba6%2BVBQPkyNfwA%3D)
+
 
 Add register and login for user to exercise 3.1 from lecture 6.
 

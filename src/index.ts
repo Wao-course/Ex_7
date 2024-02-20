@@ -4,6 +4,11 @@ import mongoose from 'mongoose';
 import { promises as fs } from 'fs';
 import { schema } from './orderModel.js';
 
+// need to add user to the schea nd add register and login mutations
+
+
+
+
 // Initialize Express app
 const app = express();
 
