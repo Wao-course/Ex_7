@@ -1,88 +1,88 @@
 import { schema } from '../models/orderModel.js'; // Import the Order model/schema
+import { user_schema } from '../models/userModel.js'; // Import the Order model/schema
+
 import mongoose from 'mongoose';
 import { promises as fs } from 'fs';
 import { ApolloServer, gql } from 'apollo-server-express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 
 const Order = mongoose.model('Order', schema);
-// Define GraphQL schema
-export const typeDefs = gql`
-  type Order {
-    id: ID!
-    material: String!
-    amount: Int!
-    currency: String!
-    price: Float!
-    timestamp: String!
-    delivery: Delivery!
-  }
+const User = mongoose.model('User', user_schema);
 
-  type Delivery {
-    first_name: String!
-    last_name: String!
-    address: Address!
-  }
-
-  type Address {
-    street_name: String!
-    street_number: String!
-    city: String!
-  }
-
-  type Query {
-    orders: [Order!]!
-    order(id: ID!): Order
-  }
-
-  type Mutation {
-    createOrder(input: OrderInput!): Order!
-    updateOrder(id: ID!, input: OrderInput!): Order!
-    deleteOrder(id: ID!): Order!
-    seedDatabase: SeedResponse!
-  }
-
-  type SeedResponse {
-    orders: OrderSeedResult!
-  }
-
-  type OrderSeedResult {
-    ids: [ID!]!
-    count: Int!
-  }
-
-  input OrderInput {
-    material: String!
-    amount: Int!
-    currency: String!
-    price: Float!
-    timestamp: String!
-    delivery: DeliveryInput!
-  }
-
-  input DeliveryInput {
-    first_name: String!
-    last_name: String!
-    address: AddressInput!
-  }
-
-  input AddressInput {
-    street_name: String!
-    street_number: String!
-    city: String!
-  }
-`;
+// Read the JSON file containing the secret
+const secretData = await fs.readFile('./Secret.json', 'utf-8');
+const { secret } = JSON.parse(secretData);
 
 // Define resolvers
 export const resolvers = {
   Query: {
+    //orders queries 
     orders: async () => {
       return await Order.find();
     },
     order: async (_, { id }) => {
       return await Order.findById(id);
     },
+
+    //user queries
+    loginUser: async (_, { user }) => {
+      const { username, password } = user;
+  
+      // Find the user by username
+      const existingUser = await User.findOne({ username }).select('+password');
+      if (!existingUser) {
+        throw new Error('User not found');
+      }
+      // Compare the password
+      const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+      if (!isPasswordValid) {
+        throw new Error('Invalid password');
+      }
+      console.log("User logged in successfully");
+      // Generate JWT token
+      const token = jwt.sign({ id: existingUser._id }, secret, { expiresIn: '1h' });
+      
+      return token;
+    },
+    users: async () => {
+      return await User.find();
+    },
   },
+
   Mutation: {
+    //user mutations
+    registerUser: async (_, { user }) => {
+      const { username, password } = user;
+      console.log("Attempting to create a user...");
+  
+      try {
+        // Check if user already exists
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+          console.log("User already exists");
+          throw new Error('Username is already taken');
+        }
+  
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+  
+        // Create a new user
+        const newUser = new User({ username, password: hashedPassword });
+        await newUser.save();
+  
+        console.log("User registered successfully");
+        return 'User registered successfully';
+      } catch (error) {
+        console.error("Error registering user:", error);
+        throw error;
+      }
+    },
+
+  
+    //orders resolvers
+
     createOrder: async (_, { input }) => {
       const order = new Order(input);
       await order.save();

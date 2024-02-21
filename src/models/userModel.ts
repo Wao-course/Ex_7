@@ -1,25 +1,12 @@
-export default class UserModel {
-    private username: string;
-    private password: string;
+import { Schema, Document } from 'mongoose';
 
-    constructor(username: string, password: string) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public getUsername(): string {
-        return this.username;
-    }
-
-    public getPassword(): string {
-        return this.password;
-    }
-
-    public setUsername(username: string): void {
-        this.username = username;
-    }
-
-    public setPassword(password: string): void {
-        this.password = password;
-    }
+export interface IUser extends Document {
+    username: string;
+    password: string;
 }
+
+export const user_schema = new Schema<IUser>({
+    username: { type: String, required: true },
+    password: { type: String, required: true }
+});
+

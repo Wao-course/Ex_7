@@ -1,0 +1,79 @@
+type User {
+  id: ID!
+  username: String!
+  password: String!
+
+}
+
+type Order {
+  id: ID!
+  material: String!
+  amount: Int!
+  currency: String!
+  price: Float!
+  timestamp: String!
+  delivery: Delivery!
+}
+
+type Delivery {
+  first_name: String!
+  last_name: String!
+  address: Address!
+}
+
+type Address {
+  street_name: String!
+  street_number: String!
+  city: String!
+}
+
+type Query {
+  orders: [Order!]!
+  order(id: ID!): Order
+  loginUser(user: UserInput!): String
+  users: [User!]!
+}
+
+type Mutation {
+  createOrder(input: OrderInput!): Order!
+  updateOrder(id: ID!, input: OrderInput!): Order!
+  deleteOrder(id: ID!): Order!
+  seedDatabase: SeedResponse!
+  registerUser(user: UserInput!): String
+}
+
+type SeedResponse {
+  orders: OrderSeedResult!
+}
+
+type OrderSeedResult {
+  ids: [ID!]!
+  count: Int!
+}
+
+input OrderInput {
+  material: String!
+  amount: Int!
+  currency: String!
+  price: Float!
+  timestamp: String!
+  delivery: DeliveryInput!
+}
+
+input DeliveryInput {
+  first_name: String!
+  last_name: String!
+  address: AddressInput!
+}
+
+input AddressInput {
+  street_name: String!
+  street_number: String!
+  city: String!
+}
+
+input UserInput{
+  username: String!
+  password: String!
+}
+
