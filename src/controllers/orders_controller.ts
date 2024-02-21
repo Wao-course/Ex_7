@@ -1,22 +1,12 @@
-import { ApolloServer, gql } from 'apollo-server-express';
-import express from 'express';
+import { schema } from '../models/orderModel.js'; // Import the Order model/schema
 import mongoose from 'mongoose';
 import { promises as fs } from 'fs';
-import { schema } from './orderModel.js';
+import { ApolloServer, gql } from 'apollo-server-express';
 
-// need to add user to the schea nd add register and login mutations
-
-
-
-
-// Initialize Express app
-const app = express();
 
 const Order = mongoose.model('Order', schema);
-
-
 // Define GraphQL schema
-const typeDefs = gql`
+export const typeDefs = gql`
   type Order {
     id: ID!
     material: String!
@@ -83,7 +73,7 @@ const typeDefs = gql`
 `;
 
 // Define resolvers
-const resolvers = {
+export const resolvers = {
   Query: {
     orders: async () => {
       return await Order.find();
@@ -132,35 +122,3 @@ const resolvers = {
     },
   },
 };
-
-// Create Apollo Server instance
-const server = new ApolloServer({ typeDefs, resolvers });
-
-async function startServer() {
-  await server.start();
-
-  // Apply middleware to Express app
-  server.applyMiddleware({ app });
-
-  // Start the server
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}${server.graphqlPath}`);
-  });
-}
-
-// Connect to MongoDB and start the server
-async function connectToDatabase() {
-  try {
-    await mongoose.connect('mongodb://root:example@localhost:27017/', { dbName: "Books" });
-    console.log("Connected to MongoDB");
-
-    await startServer();
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-  }
-}
-
-// Call the function to connect to MongoDB and start the server
-connectToDatabase();
-
