@@ -1,3 +1,5 @@
+directive @auth on FIELD_DEFINITION
+
 type User {
   id: ID!
   username: String!
@@ -28,17 +30,18 @@ type Address {
 }
 
 type Query {
-  orders: [Order!]!
-  order(id: ID!): Order
-  loginUser(user: UserInput!): String
-  users: [User!]!
+  orders: [Order!]! @auth
+  order(id: ID!): Order @auth
+  users: [User!]! @auth
+  loginUser(user: UserInput!): String 
+
 }
 
 type Mutation {
-  createOrder(input: OrderInput!): Order!
-  updateOrder(id: ID!, input: OrderInput!): Order!
-  deleteOrder(id: ID!): Order!
-  seedDatabase: SeedResponse!
+  createOrder(input: OrderInput!): Order! @auth
+  updateOrder(id: ID!, input: OrderInput!): Order! @auth
+  deleteOrder(id: ID!): Order! @auth
+  seedDatabase: SeedResponse! @auth
   registerUser(user: UserInput!): String
 }
 

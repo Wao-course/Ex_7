@@ -6,6 +6,7 @@ import { promises as fs } from 'fs';
 import { ApolloServer, gql } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { generateToken, verifyToken} from '../auth/auth.js';
 
 
 const Order = mongoose.model('Order', schema);
@@ -19,10 +20,13 @@ const { secret } = JSON.parse(secretData);
 export const resolvers = {
   Query: {
     //orders queries 
-    orders: async () => {
+    orders: async (_, __, context) => {
+      isAuthenticated(context);
       return await Order.find();
     },
-    order: async (_, { id }) => {
+    order: async (_, { id }, context) => {
+      isAuthenticated(context);
+
       return await Order.findById(id);
     },
 
@@ -40,10 +44,11 @@ export const resolvers = {
       if (!isPasswordValid) {
         throw new Error('Invalid password');
       }
-      console.log("User logged in successfully");
-      // Generate JWT token
-      const token = jwt.sign({ id: existingUser._id }, secret, { expiresIn: '1h' });
       
+      // Generate JWT token
+      const token = generateToken(existingUser._id); // Generate token
+      console.log("User logged in successfully");
+      console.log(token);
       return token;
     },
     users: async () => {
@@ -83,15 +88,25 @@ export const resolvers = {
   
     //orders resolvers
 
-    createOrder: async (_, { input }) => {
+    createOrder: async (_, { input }, context) => {
+      if (!context || !context.req || !context.req.headers || !context.req.headers.authorization) {
+        throw new Error('Authentication token missing');
+      }
+    
+      const token = context.req.headers.authorization.split(' ')[1];
+      isAuthenticated(context);      // Authorize the user (optional)
+      console.log(context.req.headers.authorization); // Log the authorization header
+
       const order = new Order(input);
       await order.save();
       return order;
     },
-    updateOrder: async (_, { id, input }) => {
+    updateOrder: async (_, { id, input }, context) => {
+      isAuthenticated(context);      // Authorize the user (optional)
       return await Order.findByIdAndUpdate(id, input, { new: true });
     },
-    deleteOrder: async (_, { id }) => {
+    deleteOrder: async (_, { id }, context) => {
+      isAuthenticated(context);      // Authorize the user (optional)
       return await Order.findByIdAndDelete(id);
     },
     seedDatabase: async () => {
@@ -121,4 +136,10 @@ export const resolvers = {
       }
     },
   },
+};
+
+const isAuthenticated = (context) => {
+  if (!context.user) {
+    throw new Error('You must be logged in to perform this action');
+  }
 };

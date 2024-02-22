@@ -38,10 +38,17 @@ classDiagram
         street_number: String!
         city: String!
     }
+
+    class User {
+        first_name: String!
+        last_name: String!
+        email: String!
+    }
     
     class Query {
         orders: [Order!]!
         order(id: ID!): Order
+        users: [User!]!
     }
     
     class Mutation {
@@ -49,6 +56,7 @@ classDiagram
         updateOrder(id: ID!, input: OrderInput!): Order!
         deleteOrder(id: ID!): Order!
         seedDatabase: SeedResponse!
+        registerUser(user: UserInput!): String
     }
     
     class SeedResponse {
@@ -81,7 +89,7 @@ classDiagram
         city: String!
     }
 
-    class User {
+    class UserInput {
         first_name: String!
         last_name: String!
         email: String!
@@ -97,15 +105,9 @@ classDiagram
     typeDefs <-- DeliveryInput
     typeDefs <-- AddressInput
     typeDefs <-- User
-    
-    Order --> Delivery: delivery
-    Delivery --> Address: address
-    Query --> Order: orders
-    Query --> Order: order
-    Mutation --> Order: createOrder
-    Mutation --> Order: updateOrder
-    Mutation --> Order: deleteOrder
-    Mutation --> SeedResponse: seedDatabase
+    Query --> User: users
+    Mutation --> User: registerUser
+    User --> UserInput: registerUser
     SeedResponse --> OrderSeedResult: orders
 
 
@@ -119,6 +121,9 @@ Add register and login for user to exercise 3.1 from lecture 6.
 
 - Add a user type to the schema, a mutation to register, and a login query that will return a jwt if provided with the right credentials.
 You can be inspired by this REST based demo <https://jasonwatmore.com/nodejs-jwt-authentication-tutorial-with-example-api>
+
+![alt text](image.png) ![alt text](image-1.png)
+> after adding the user type to the schema, a mutation to register, and a login query that will return a jwt if provided with the right credentials. I was able to register a user and login to get a token.
 
 ### 1.2
 

@@ -3,12 +3,18 @@ import { ApolloServer } from 'apollo-server-express';
 import { connectToDatabase } from './mongoDb.js';
 import { readFileSync } from 'fs';
 import { resolvers } from './controllers/orders_controller.js';
+import { generateToken, verifyToken} from './auth/auth.js';
 
 // Initialize Express app
 const app = express();
 const typeDefs = readFileSync('src/schema/schema.graphql', { encoding: 'utf-8' });
 // Create Apollo Server instance
-const server = new ApolloServer({ typeDefs, resolvers });
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => ({ token: req.headers.authorization }),
+});
 
 async function startServer() {
   await server.start();
@@ -24,4 +30,4 @@ async function startServer() {
 }
 
 // Call the function to connect to MongoDB and start the server
-connectToDatabase().then(startServer).catch(error => console.error('Error connecting to MongoDB:', error));
+connectToDatabase().then(startServer).catch(error => console.error('Error connecting to MongoDB or somethings wrong with the server ;) :', error));
