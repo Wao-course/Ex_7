@@ -1,7 +1,6 @@
 directive @auth on FIELD_DEFINITION
 
 type User {
-  id: ID!
   username: String!
   password: String!
 

@@ -122,12 +122,16 @@ Add register and login for user to exercise 3.1 from lecture 6.
 - Add a user type to the schema, a mutation to register, and a login query that will return a jwt if provided with the right credentials.
 You can be inspired by this REST based demo <https://jasonwatmore.com/nodejs-jwt-authentication-tutorial-with-example-api>
 
-![alt text](image.png) ![alt text](image-1.png)
+![alt text](./assets/image.png) ![alt text](./assets/image-1.png)
 > after adding the user type to the schema, a mutation to register, and a login query that will return a jwt if provided with the right credentials. I was able to register a user and login to get a token.
+we can also see the user in the database after registering it.
 
 ### 1.2
 
 Add authorization to your server app so only authenticated users can add new books. You can find help here: <https://www.apollographql.com/docs/apollo-server/security/authentication>
+> adding auth.ts and using it to check if the user is authenticated before adding a new order to the database.
+Remember to add the context to the server to be able to use the user object in the resolvers.
+And to include the token generated at login in the request headers when adding a new order
 
 ## Exercise 2 - Use PostgreSQL as data store
 

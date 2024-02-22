@@ -2,8 +2,15 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { connectToDatabase } from './mongoDb.js';
 import { readFileSync } from 'fs';
-import { resolvers } from './controllers/orders_controller.js';
+import { resolvers } from './resolvers/resolvers.js';
 import { generateToken, verifyToken} from './auth/auth.js';
+import jwt from 'jsonwebtoken';
+
+
+
+
+const secretData = readFileSync('./Secret.json', 'utf-8');
+const { secret } = JSON.parse(secretData);
 
 // Initialize Express app
 const app = express();
@@ -13,7 +20,21 @@ const typeDefs = readFileSync('src/schema/schema.graphql', { encoding: 'utf-8' }
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ token: req.headers.authorization }),
+  context: ({ req }) => {
+    // Extract JWT token from request headers
+    const token = req.headers.authorization || '';
+
+    try {
+      // Decode JWT token and extract user information
+      const user = jwt.verify(token.replace('Bearer ', ''), secret);
+      
+      // Attach user object to context
+      return { user };
+    } catch (error) {
+      // If token is invalid or missing, return an empty user object
+      return { user: null };
+    }
+  },
 });
 
 async function startServer() {

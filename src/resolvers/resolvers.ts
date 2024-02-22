@@ -1,12 +1,11 @@
-import { schema } from '../models/orderModel.js'; // Import the Order model/schema
-import { user_schema } from '../models/userModel.js'; // Import the Order model/schema
-
 import mongoose from 'mongoose';
 import { promises as fs } from 'fs';
 import { ApolloServer, gql } from 'apollo-server-express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { generateToken, verifyToken} from '../auth/auth.js';
+import { schema } from '../models/orderModel.js'; // Import the Order model/schema
+import { user_schema } from '../models/userModel.js'; // Import the Order model/schema
 
 
 const Order = mongoose.model('Order', schema);
@@ -85,18 +84,10 @@ export const resolvers = {
       }
     },
 
-  
     //orders resolvers
 
     createOrder: async (_, { input }, context) => {
-      if (!context || !context.req || !context.req.headers || !context.req.headers.authorization) {
-        throw new Error('Authentication token missing');
-      }
-    
-      const token = context.req.headers.authorization.split(' ')[1];
       isAuthenticated(context);      // Authorize the user (optional)
-      console.log(context.req.headers.authorization); // Log the authorization header
-
       const order = new Order(input);
       await order.save();
       return order;
