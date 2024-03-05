@@ -32,7 +32,7 @@ type Query {
   orders: [Order!]! @auth
   order(id: ID!): Order @auth
   users: [User!]! @auth
-  loginUser(user: UserInput!): String 
+  
 
 }
 
@@ -42,6 +42,7 @@ type Mutation {
   deleteOrder(id: ID!): Order! @auth
   seedDatabase: SeedResponse! @auth
   registerUser(user: UserInput!): String
+  loginUser(user: UserInput!): String 
 }
 
 type SeedResponse {

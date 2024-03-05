@@ -4,8 +4,8 @@ import { readFileSync } from 'fs';
 import resolvers from './resolvers/resolvers.js';
 import { generateToken, verifyToken} from './auth/auth.js';
 import jwt from 'jsonwebtoken';
-import { Pool } from 'pg';
-
+import pkg from 'pg';
+const { Pool } = pkg;
 
 // Initialize PostgreSQL connection pool
 const pool = new Pool({

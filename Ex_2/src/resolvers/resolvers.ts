@@ -1,7 +1,8 @@
-const { Pool } = require('pg');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const fs = require('fs').promises;
+import pkg from 'pg';
+const { Pool } = pkg;
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
 
 // Initialize PostgreSQL connection pool
 const pool = new Pool({
@@ -14,7 +15,7 @@ const pool = new Pool({
 
 // Read secret key from file
 const readSecretKey = async () => {
-  const secretData = await fs.readFile('./Secret.json', 'utf-8');
+  const secretData = await fs.readFileSync('./Secret.json', 'utf-8');
   return JSON.parse(secretData).secret;
 };
 
@@ -135,7 +136,7 @@ const resolvers = {
     },
     seedDatabase: async () => {
       try {
-        const ordersDataRaw = await fs.readFile("C:/Users/hashe/Documents/group/ex_6/appolo-server/graphql-server-example/MOCK_DATA_MATERIALS.json", "utf-8");
+        const ordersDataRaw = await fs.readFileSync("C:/Users/hashe/Documents/group/ex_6/appolo-server/graphql-server-example/MOCK_DATA_MATERIALS.json", "utf-8");
         const ordersData = JSON.parse(ordersDataRaw); // Parse the JSON string into an object
 
         const client = await pool.connect();
