@@ -1,0 +1,81 @@
+directive @auth on FIELD_DEFINITION
+
+type User {
+  username: String!
+  password: String!
+
+}
+
+type Order {
+  id: ID!
+  material: String!
+  amount: Int!
+  currency: String!
+  price: Float!
+  timestamp: String!
+  delivery: Delivery!
+}
+
+type Delivery {
+  first_name: String!
+  last_name: String!
+  address: Address!
+}
+
+type Address {
+  street_name: String!
+  street_number: String!
+  city: String!
+}
+
+type Query {
+  orders: [Order!]! @auth
+  order(id: ID!): Order @auth
+  users: [User!]! @auth
+  loginUser(user: UserInput!): String 
+
+}
+
+type Mutation {
+  createOrder(input: OrderInput!): Order! @auth
+  updateOrder(id: ID!, input: OrderInput!): Order! @auth
+  deleteOrder(id: ID!): Order! @auth
+  seedDatabase: SeedResponse! @auth
+  registerUser(user: UserInput!): String
+}
+
+type SeedResponse {
+  orders: OrderSeedResult!
+}
+
+type OrderSeedResult {
+  ids: [ID!]!
+  count: Int!
+}
+
+input OrderInput {
+  material: String!
+  amount: Int!
+  currency: String!
+  price: Float!
+  timestamp: String!
+  delivery: DeliveryInput!
+}
+
+input DeliveryInput {
+  first_name: String!
+  last_name: String!
+  address: AddressInput!
+}
+
+input AddressInput {
+  street_name: String!
+  street_number: String!
+  city: String!
+}
+
+input UserInput{
+  username: String!
+  password: String!
+}
+

@@ -139,6 +139,73 @@ And to include the token generated at login in the request headers when adding a
 
 1. Start PostgreSQL in a container - I suggest that you use postgres:16.2-alpine <https://hub.docker.com/_/postgres>.
 2. Use pgAdmin 4 <https://www.pgadmin.org/docs/pgadmin4/6.20/index.html> to connect to your PostgreSQL database. You can run pgAdmin4 in a container <https://hub.docker.com/r/dpage/pgadmin4/>. Create a docker compose file that spins up both containers. Setup a new database with two tables that can replace the books and users arrays as data store, and populate the books table with some data.
+    > the docker compose file is as follows
+    ```yaml
+    version: '3.8'
+
+    services:
+    postgres:
+        image: postgres:16.2-alpine
+        environment:
+        POSTGRES_PASSWORD: ilovecake
+        ports:
+        - "5432:5432"
+        volumes:
+        - postgres_data:/var/lib/postgresql/data
+
+    pgadmin:
+        image: dpage/pgadmin4
+        environment:
+        PGADMIN_DEFAULT_EMAIL: admin@example.com
+        PGADMIN_DEFAULT_PASSWORD: admin
+        ports:
+        - "5050:80"
+        depends_on:
+        - postgres
+
+    volumes:
+    postgres_data:
+
+    ```
+
+    > the database is created and the tables are created as follows
+    ```sql
+
+    CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE addresses (
+        id SERIAL PRIMARY KEY,
+        street_name VARCHAR(255) NOT NULL,
+        street_number VARCHAR(255) NOT NULL,
+        city VARCHAR(255) NOT NULL
+    );
+
+    CREATE TABLE deliveries (
+        id SERIAL PRIMARY KEY,
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
+        address_id INT NOT NULL,
+        FOREIGN KEY (address_id) REFERENCES addresses(id)
+    );
+
+
+    CREATE TABLE orders (
+        id SERIAL PRIMARY KEY,
+        material VARCHAR(255) NOT NULL,
+        amount INT NOT NULL,
+        currency VARCHAR(255) NOT NULL,
+        price FLOAT NOT NULL,
+        timestamp TIMESTAMP NOT NULL,
+        delivery_id INT NOT NULL,
+        FOREIGN KEY (delivery_id) REFERENCES deliveries(id)
+    );
+    ```
+
+
 3. Change you app from exercise 1 so that it connects to your PostgreSQL DB, and uses the database as data store. You may get some help here: <https://node-postgres.com/>.
 
 ## Exercise 3 - Use Prisma
