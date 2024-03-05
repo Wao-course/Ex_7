@@ -207,6 +207,12 @@ And to include the token generated at login in the request headers when adding a
 
 
 3. Change you app from exercise 1 so that it connects to your PostgreSQL DB, and uses the database as data store. You may get some help here: <https://node-postgres.com/>.
+    > changes made to the index.ts, resolvers, schema and auth.ts to connect to the postgresql database and use it as a data store check the folder ```Ex_2```
+    - ``` npm run dev``` to start the server with nodemon 
+    - ``` npm run start``` to start the server without nodemon	
+    - the server is running on port 4000 and accecible through the browser on ```http://localhost:4000/graphql``` using the grapghql playground to test the queries and mutations
+    
+
 
 ## Exercise 3 - Use Prisma
 

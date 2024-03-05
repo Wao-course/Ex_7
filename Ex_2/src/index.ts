@@ -1,11 +1,9 @@
 import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
-import resolvers from './resolvers/resolvers.js';
-import { generateToken, verifyToken} from './auth/auth.js';
+import resolvers from './resolvers/resolvers';
 import jwt from 'jsonwebtoken';
-import pkg from 'pg';
-const { Pool } = pkg;
+import { Pool } from 'pg';
 
 // Initialize PostgreSQL connection pool
 const pool = new Pool({
@@ -15,17 +13,15 @@ const pool = new Pool({
   password: 'admin',
   port: 5432,
 });
-
-
-
+// Read secret data from file
 const secretData = readFileSync('./Secret.json', 'utf-8');
 const { secret } = JSON.parse(secretData);
 
 // Initialize Express app
 const app = express();
 const typeDefs = readFileSync('src/schema/schema.graphql', { encoding: 'utf-8' });
-// Create Apollo Server instance
 
+// Create Apollo Server instance
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -59,5 +55,5 @@ async function startServer() {
   });
 }
 
-// Call the function to connect to MongoDB and start the server
+// Call the function to start the server
 startServer();
